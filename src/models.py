@@ -23,7 +23,6 @@ class Vehicle:
         self.current_product = self.initial_product
 
     def reset(self):
-        """Réinitialise l'état du véhicule"""
         self.current_product = self.initial_product
         self.route.clear()
         self.load = 0.0
@@ -34,7 +33,7 @@ class Depot:
     id: int
     x: float
     y: float
-    stock: Dict[int, float]  # produit -> quantité disponible
+    stock: Dict[int, float]
 
 
 @dataclass
@@ -49,7 +48,8 @@ class Station:
     id: int
     x: float
     y: float
-    demand: Dict[int, float]  # produit -> demande restante
+    demand: Dict[int, float]
+    original_demand: Dict[int, float] = field(default_factory=dict)
 
 
 @dataclass
