@@ -87,7 +87,7 @@ mpvrp-cc-solver/
 ### 1. Cloner le projet
 
 ```bash
-git clone https://github.com/TON_USERNAME/mpvrp-cc-solver.git
+git clone https://github.com/lagbessi/mpvrp-cc-solver.git
 cd mpvrp-cc-solver
 ```
 
