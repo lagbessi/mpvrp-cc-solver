@@ -6,7 +6,7 @@
 
 ---
 
-##  Présentation
+## Présentation
 
 Ce projet implémente un **solveur modulaire et extensible** pour le problème **MPVRP-CC (Multi-Product Vehicle Routing Problem with Changeover Cost)**.
 
@@ -24,7 +24,7 @@ Ce projet est conçu pour :
 
 ---
 
-##  Objectifs
+## Objectifs
 
 * Parser des fichiers d’instances `.dat` conformes à la spécification MPVRP-CC
 * Construire des routes valides respectant toutes les contraintes
@@ -110,6 +110,31 @@ pip install -r requirements.txt
 
 ---
 
+## Organisation des instances par difficulté
+
+Les instances sont classées selon leur niveau de complexité afin de faciliter les tests, le benchmarking et la comparaison des heuristiques.
+
+```
+data/instances/
+├── small/    # Petites instances (tests rapides, débogage)
+├── medium/   # Instances intermédiaires (évaluation des heuristiques)
+└── large/    # Grandes instances (stress test, performance, recherche)
+```
+
+### Convention de nommage
+
+* `MPVRP_S_XXX.dat` → Small
+* `MPVRP_M_XXX.dat` → Medium
+* `MPVRP_L_XXX.dat` → Large
+
+Cette organisation permet d’évaluer la **scalabilité** des algorithmes et d’analyser l’impact de la taille du problème sur :
+
+* Le temps d’exécution
+* La qualité des solutions
+* Le coût total (distance + changeover)
+
+---
+
 ## Utilisation
 
 Placer une instance MPVRP-CC dans :
@@ -132,7 +157,7 @@ data/solutions/
 
 ---
 
-## Exemple de workflow
+##  Exemple de workflow
 
 1. Charger une instance
 2. Parser les données
@@ -144,7 +169,7 @@ data/solutions/
 
 ---
 
-## Contraintes respectées
+## ontraintes respectées
 
 * Satisfaction complète des demandes
 * Capacité maximale des véhicules
@@ -154,7 +179,7 @@ data/solutions/
 
 ---
 
-## Roadmap
+##  Roadmap
 
 * [x] Structure du projet
 * [x] Parser officiel `.dat`
@@ -174,7 +199,7 @@ data/solutions/
 
 ---
 
-## Auteur
+##  Auteur
 
 **Laurence Agbessi**
 Développeur & Étudiant en Informatique / Optimisation / Data Science
@@ -201,4 +226,3 @@ Les contributions sont les bienvenues !
 ---
 
 > *"Optimiser, ce n’est pas seulement aller plus vite — c’est comprendre le problème en profondeur."* 
-
