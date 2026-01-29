@@ -1,8 +1,27 @@
 """
 heuristics.py
 -------------
-Heuristique gloutonne conforme MPVRP-CC
+Heuristique améliorée MPVRP-CC
+- Regroupement par produit
+- Choix du dépôt le plus proche
+- Livraison par station la plus proche
 """
+
+from src.distance import euclidean
+
+
+def nearest_depot(node, depots):
+    return min(depots, key=lambda d: euclidean(node, d))
+
+
+def nearest_station(node, stations, product):
+    candidates = [
+        s for s in stations if s.demand.get(product, 0) > 0
+    ]
+    if not candidates:
+        return None
+    return min(candidates, key=lambda s: euclidean(node, s))
+
 
 def greedy_construct(instance):
     for v in instance.vehicles:
@@ -10,21 +29,31 @@ def greedy_construct(instance):
         v.load = 0
         v.current_product = v.initial_product
 
+        # Start
+        garage = next(g for g in instance.garages if g.id == v.home_garage)
         v.route.append(("Garage", v.home_garage))
 
+        current_node = garage
+
         for product in range(instance.num_products):
-            for station in instance.stations:
-                demand = station.demand.get(product, 0)
+            while True:
+                station = nearest_station(current_node, instance.stations, product)
+                if not station:
+                    break
 
-                while demand > 0:
-                    depot = instance.depots[0]
+                depot = nearest_depot(current_node, instance.depots)
 
-                    load = min(v.capacity, demand)
+                demand = station.demand[product]
+                load = min(v.capacity, demand)
 
-                    v.route.append(("Depot", depot.id, product, load))
-                    v.route.append(("Station", station.id, product, load))
+                # Go to depot
+                v.route.append(("Depot", depot.id, product, load))
 
-                    demand -= load
-                    station.demand[product] = demand
+                # Deliver
+                v.route.append(("Station", station.id, product, load))
 
+                station.demand[product] -= load
+                current_node = station
+
+        # Return
         v.route.append(("Garage", v.home_garage))
