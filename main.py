@@ -20,27 +20,27 @@ def main():
     instance_path = sys.argv[1]
     solution_path = "data/solutions/Sol_" + instance_path.split("/")[-1]
 
-    print("🔍 Loading instance...")
+    print("Loading instance...")
     instance = parse_instance(instance_path)
 
     start_time = time.time()
 
-    print("🚛 Constructing solution...")
+    print("Constructing solution...")
     greedy_construct(instance)
 
-    print("🔎 Validating solution...")
+    print("Validating solution...")
     errors = validate_solution(instance)
 
     if errors:
-        print("❌ Solution invalid:")
+        print(" Solution invalid:")
         for e in errors:
             print(" -", e)
         return
 
-    print("💾 Exporting solution...")
+    print(" Exporting solution...")
     export_solution(instance, solution_path, start_time)
 
-    print("✅ Done!")
+    print(" Done!")
     print(f"Solution saved to: {solution_path}")
 
 
