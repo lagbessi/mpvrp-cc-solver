@@ -1,40 +1,50 @@
 """
 heuristics.py
 -------------
-Heuristiques de construction de solution
+Heuristique gloutonne conforme MPVRP-CC
+- Respecte la capacité
+- Permet livraisons partielles
+- Satisfait toutes les demandes
 """
 
 from src.distance import euclidean
 
 
 def greedy_construct(instance):
-    """
-    Stratégie simple :
-    - Chaque véhicule traite les demandes par produit
-    - Charge au dépôt le plus proche
-    - Livre les stations les plus proches
-    """
+    for v in instance.vehicles:
+        v.route.clear()
+        v.load = 0
+        v.current_product = v.initial_product
 
-    for vehicle in instance.vehicles:
         # Start at garage
-        vehicle.route.append(("Garage", vehicle.home_garage))
+        v.route.append(("Garage", v.home_garage))
 
         for product in range(instance.num_products):
             for station in instance.stations:
                 demand = station.demand.get(product, 0)
 
-                if demand <= 0:
-                    continue
+                while demand > 0:
+                    # Choisir dépôt (simple : premier)
+                    depot = instance.depots[0]
 
-                depot = instance.depots[0]  # simple : premier dépôt
+                    # Aller au dépôt et charger
+                    v.route.append(("Depot", depot.id, product, 0))
+                    v.current_product = product
+                    v.load = min(v.capacity, demand)
 
-                # Load
-                vehicle.route.append(("Depot", depot.id, product, demand))
+                    # Mise à jour de la dernière ligne depot avec la vraie charge
+                    v.route[-1] = ("Depot", depot.id, product, v.load)
 
-                # Deliver
-                vehicle.route.append(("Station", station.id, product, demand))
+                    # Livrer
+                    delivered = v.load
+                    v.route.append(("Station", station.id, product, delivered))
 
-                station.demand[product] = 0
+                    # Mise à jour demande station
+                    demand -= delivered
+                    station.demand[product] = demand
+
+                    # Camion vidé
+                    v.load = 0
 
         # Return to garage
-        vehicle.route.append(("Garage", vehicle.home_garage))
+        v.route.append(("Garage", v.home_garage))
