@@ -1,45 +1,25 @@
-"""
-parser.py
----------
-Lecture et parsing des fichiers d'instance MPVRP-CC (.dat)
-"""
-
-from typing import List
-from src.models import *
 import os
+from src.models import Vehicle, Depot, Garage, Station, Instance
 
-
-def _clean_lines(filepath: str) -> List[str]:
-    with open(filepath, "r") as f:
-        return [l.strip() for l in f.readlines() if l.strip() and not l.startswith("//")]
-
-
-def parse_instance(filepath: str) -> Instance:
+def parse_instance(filepath):
     if not os.path.exists(filepath):
-        raise FileNotFoundError(f"Instance not found: {filepath}")
+        raise FileNotFoundError(filepath)
 
-    lines = _clean_lines(filepath)
+    with open(filepath, "r") as f:
+        lines = [l.strip() for l in f if l.strip() and not l.startswith("//")]
 
-    uuid_line = lines[0]
-    uuid_str = uuid_line.replace("#", "").strip()
-
+    uuid_str = lines[0].replace("#", "").strip()
     nb_p, nb_d, nb_g, nb_s, nb_v = map(int, lines[1].split())
     idx = 2
 
     transition_costs = []
     for _ in range(nb_p):
-        row = list(map(float, lines[idx].split()))
-        if len(row) != nb_p:
-            raise ValueError("Transition cost matrix size mismatch")
-        transition_costs.append(row)
+        transition_costs.append(list(map(float, lines[idx].split())))
         idx += 1
 
     vehicles = []
     for _ in range(nb_v):
-        parts = list(map(int, lines[idx].split()))
-        if len(parts) != 4:
-            raise ValueError("Invalid vehicle line format")
-        v_id, cap, garage, prod = parts
+        v_id, cap, garage, prod = map(int, lines[idx].split())
         vehicles.append(Vehicle(v_id, cap, garage, prod))
         idx += 1
 
@@ -48,12 +28,9 @@ def parse_instance(filepath: str) -> Instance:
         parts = lines[idx].split()
         d_id = int(parts[0])
         x, y = map(float, parts[1:3])
-        stock_vals = list(map(float, parts[3:]))
+        stocks = dict(enumerate(map(float, parts[3:])))
+        depots.append(Depot(d_id, x, y, stocks.copy(), stocks.copy()))
 
-        if len(stock_vals) != nb_p:
-            raise ValueError("Depot stock size mismatch")
-
-        depots.append(Depot(d_id, x, y, dict(enumerate(stock_vals))))
         idx += 1
 
     garages = []
@@ -67,30 +44,10 @@ def parse_instance(filepath: str) -> Instance:
         parts = lines[idx].split()
         s_id = int(parts[0])
         x, y = map(float, parts[1:3])
-        demands = list(map(float, parts[3:]))
-
-        if len(demands) != nb_p:
-            raise ValueError("Station demand size mismatch")
-
-        demand_dict = dict(enumerate(demands))
-
+        demands = dict(enumerate(map(float, parts[3:])))
         stations.append(
-            Station(
-                id=s_id,
-                x=x,
-                y=y,
-                demand=demand_dict.copy(),
-                original_demand=demand_dict.copy(),
-            )
+            Station(s_id, x, y, demands.copy(), demands.copy())
         )
         idx += 1
 
-    return Instance(
-        uuid=uuid_str,
-        num_products=nb_p,
-        vehicles=vehicles,
-        depots=depots,
-        garages=garages,
-        stations=stations,
-        transition_costs=transition_costs,
-    )
+    return Instance(uuid_str, nb_p, vehicles, depots, garages, stations, transition_costs)

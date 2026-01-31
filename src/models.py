@@ -1,12 +1,5 @@
-"""
-models.py
----------
-Structures de données principales pour le solveur MPVRP-CC
-"""
-
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple
-
 
 @dataclass
 class Vehicle:
@@ -14,19 +7,7 @@ class Vehicle:
     capacity: float
     home_garage: int
     initial_product: int
-
-    current_product: int = field(init=False)
     route: List[Tuple] = field(default_factory=list)
-    load: float = field(default=0.0)
-
-    def __post_init__(self):
-        self.current_product = self.initial_product
-
-    def reset(self):
-        self.current_product = self.initial_product
-        self.route.clear()
-        self.load = 0.0
-
 
 @dataclass
 class Depot:
@@ -34,7 +15,7 @@ class Depot:
     x: float
     y: float
     stock: Dict[int, float]
-
+    original_stock: Dict[int, float] = field(default_factory=dict)
 
 @dataclass
 class Garage:
@@ -42,15 +23,13 @@ class Garage:
     x: float
     y: float
 
-
 @dataclass
 class Station:
     id: int
     x: float
     y: float
     demand: Dict[int, float]
-    original_demand: Dict[int, float] = field(default_factory=dict)
-
+    original_demand: Dict[int, float]
 
 @dataclass
 class Instance:

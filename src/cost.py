@@ -1,9 +1,6 @@
-"""
-cost.py
--------
-Gestion des coûts de changement de produit
-"""
-
-
-def changeover_cost(instance, from_product: int, to_product: int) -> float:
-    return instance.transition_costs[from_product][to_product]
+def changeover_cost(instance, p1, p2):
+   
+    try:
+        return instance.transition_costs[int(p1)][int(p2)]
+    except (IndexError, TypeError, ValueError):
+        return 0.0
